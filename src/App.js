@@ -98,7 +98,7 @@ class FindDuplicates extends React.Component{
         <textarea inputValue = {this.state.inputValue} duplicateLength = {this.state.duplicateLength} onChange = {e =>((this.findDuplicates(e), this.duplicateLengthMethod(e), this.deleteDuplicateMethod(e), this.copyDuplicateMethod(e)))}></textarea>
         
         <DuplicatesContent inputValue = {this.state.inputValue} />
-        <DuplicatesLength duplicateLength = {this.state.duplicateLength} />
+        {/*<DuplicatesLength duplicateLength = {this.state.duplicateLength} />*/}
         {/*<h3  >{this.state.duplicateLength}</h3> This shows length functionality*/}
         <DeleteDuplicate deleteDuplicateMethod = {this.state.deleteDuplicate} />
         <CopyDuplicate copyDuplicateMethod = {this.state.copyDuplicate} />
@@ -194,13 +194,22 @@ class SectionTwo extends React.Component{
 class App extends React.Component{
   constructor(props) {
     super(props);
-
+    this.state = {duplicateLength: 0}
+    this.duplicateLengthMethod = this.duplicateLengthMethod.bind(this)
+  }
+  duplicateLengthMethod(event) {
+    this.setState((state) => {
+      const firstResult = event.target.value.split(" ")
+      const secondResult = firstResult.filter((value, index) => firstResult.indexOf(value) !== index)
+      const thirdResult = secondResult.length
+      return {duplicateLength: <h3>{thirdResult}</h3>}
+    })
   }
   render() {
     return (
       <div className="d-flex justify-content-between">
         <FindDuplicates />
-        
+        <DuplicatesLength duplicateLength = {this.state.duplicateLength} />
       </div>
     )
   }
