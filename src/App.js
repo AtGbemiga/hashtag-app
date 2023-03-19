@@ -1,169 +1,86 @@
-import React from "react"
-import ReactDOM  from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom";
 
-class TextareaLogic extends React.Component{
+class TextareaLogic extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {inputValue: ""} 
-    this.getTextareaInputMethod = this.getTextareaInputMethod.bind(this)
+    this.state = { inputValue: "", duplicates: [], mode: "Find Similar Hashtags" };
+    this.getTextareaInputMethod = this.getTextareaInputMethod.bind(this);
+    this.convertToArrAndFindDuplicate = this.convertToArrAndFindDuplicate.bind(this);
+    this.deleteDuplicate = this.deleteDuplicate.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.copyContent = this.copyContent.bind(this);
   }
-    getTextareaInputMethod(event) {
-      this.setState({inputValue: event.target.value})
+
+  getTextareaInputMethod(event) {
+    this.setState({ inputValue: event.target.value, duplicates: [], mode: "Find Similar Hashtags" });
+  }
+
+  convertToArrAndFindDuplicate() {
+    const { inputValue } = this.state;
+    const firstResult = inputValue.split(" ");
+    const duplicates = firstResult.filter((value, index) => firstResult.indexOf(value) !== index);
+    this.setState({ duplicates, mode: "Remove Duplicates" });
+  }
+
+  deleteDuplicate() {
+    const { inputValue } = this.state;
+    const firstResult = inputValue.split(" ");
+    const uniqueChars = [...new Set(firstResult)].join(" ");
+    this.setState({ inputValue: uniqueChars, mode: "Copy" });
+  }
+
+  copyContent() {
+    const textarea = document.getElementById("textarea");
+    textarea.select();
+    document.execCommand("copy");
+    this.setState({ mode: "Copied!" });
+  }
+
+  handleButtonClick() {
+    const { mode } = this.state;
+    if (mode === "Find Similar Hashtags") {
+      this.convertToArrAndFindDuplicate();
+    } else if (mode === "Remove Duplicates") {
+      this.deleteDuplicate();
+    } else if (mode === "Copy") {
+      this.copyContent();
     }
+  }
+
   render() {
-    return(
+    const { inputValue, duplicates, mode } = this.state;
+    return (
       <>
-          <TextareaBox inputValue = {this.state.inputValue} getTextareaInputMethod = {this.getTextareaInputMethod}/>
-          <ConvertToArrAndFindDuplicate inputValue = {this.state.inputValue} getTextareaInputMethod = {this.getTextareaInputMethod} />
-          <DeleteDuplicate inputValue = {this.state.inputValue} getTextareaInputMethod = {this.getTextareaInputMethod} />
+        <TextareaBox inputValue={inputValue} getTextareaInputMethod={this.getTextareaInputMethod} />
+        {duplicates.length > 0 && <DuplicateLength count={duplicates.length} />}
+        <button onClick={this.handleButtonClick}>{mode}</button>
       </>
-    )
+    );
   }
 }
 
-class TextareaBox extends React.Component{
+class TextareaBox extends React.Component {
   render() {
-    return(
-      <textarea inputValue = {this.props.inputValue} ></textarea>
-    )
+    const { inputValue, getTextareaInputMethod } = this.props;
+    return <textarea id="textarea" value={inputValue} onChange={getTextareaInputMethod}></textarea>;
   }
 }
 
-class ConvertToArrAndFindDuplicate extends React.Component{
-  constructor(props) {
-    super(props)
-    this.state = {data: this.props.inputValue}
-    this.convertToArrMethod = this.convertToArrMethod.bind(this)
-  }
-  convertToArrMethod(data) {
-    this.firstBtnMethod(
-      this.setState((state) => 
-      {const firstResult = data.split(" ")
-       const secondResult = firstResult.filter((value, index) => firstResult.indexOf(value) !== index)
-       return {data: {secondResult}}
-      }
-      )
-    )
-  }
+class DuplicateLength extends React.Component {
   render() {
-    return(
-      <>
-        <DuplicateLength data = {this.state.data} convertToArrMethod = {this.convertToArrMethod} />
-        <BtnEvent convertToArrMethod = {this.convertToArrMethod} />
-      </>
-    )
+    const { count } = this.props;
+    return <div>{count} duplicates found.</div>;
   }
 }
 
-class DeleteDuplicate extends React.Component{
-  constructor(props) {
-    super(props)
-    this.state = {deleteVar: this.props.inputValue}
-    this.deleteDuplicateMethod = this.deleteDuplicateMethod.bind(this)
-  }
-  deleteDuplicateMethod(deleteVar) {
-    this.secondBtnMethod(
-      this.setState((state) => {      
-        const fourthResult = deleteVar
-        let uniqueChars = [...new Set(fourthResult)].join(" ");
-        return {deleteVar: {uniqueChars}}
-      })
-    )
-  }
-  render() {
-    return(
-      <>
-        {this.state.deleteVar}
-      </>
-    )
-  }
-}
-
-class DuplicateLength extends React.Component{
-  constructor(props) {
-    super(props)
-    this.state = {lengthVar: this.props.data}
-    this.duplicateLengthMethod = this.duplicateLengthMethod.bind(this)
-  }
-  duplicateLengthMethod(lengthVar) {
-    this.firstBtnMethod(
-      this.setState((state) => {
-        const thirdResult = lengthVar.length
-        return {lengthVar: {thirdResult}}
-      })
-    )
-  }
-  render() {
-    return(
-      <>
-        {this.state.lengthVar}
-      </>
-    )
-  }
-}
-
-
-
-class BtnEvent extends React.Component{
-  constructor(props) {
-    super(props)
-    this.state = {mode: "Find Similar Hashtags"}
-    this.firstBtnMethod = this.firstBtnMethod.bind(this)
-    this.secondBtnMethod = this.secondBtnMethod.bind(this)
-  }
-  firstBtnMethod(event) {
-      this.setState(
-        {mode: "Replace Similar Hashtags"}
-      )
-      this.props.updateMethod("Replace Similar Hashtags");
-  }
-  secondBtnMethod(event) {
-    this.setState({mode: "Copy"})
-    this.props.updateMethod("Copy");
-  }
-  render() {
-    return(
-      <button onClick={this.state.mode === "Find Similar Hashtags" ? this.firstBtnMethod : this.secondBtnMethod}>{this.state.mode}</button>
-    )
-  }
-}
-
-class SectionOne extends React.Component{
-  render() {
-    return(
-      <>
-        <h3>Updates</h3>
-        <h4>Issues found</h4>
-        <DuplicateLength />
-      </>
-    )
-  }
-}
-
-class SectionTwo extends React.Component{
-  render() {
-    return(
-      <>
-        <h4>Heading</h4>
-        <TextareaBox />
-        <BtnEvent />
-      </>
-    )
-  }
-}
-
-class App extends React.Component{
-  constructor(props) {
-    super(props);
- 
-  }
+class App extends React.Component {
   render() {
     return (
       <div className="d-flex justify-content-between">
-        <SectionOne/>
-        <SectionTwo />
+        <TextareaLogic />
       </div>
-    )
+    );
   }
 }
 
