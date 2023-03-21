@@ -74,10 +74,33 @@ class DuplicateLength extends React.Component {
   }
 }
 
+class SectionOne extends React.Component{
+  render() {
+    return(
+      <>
+        <h3>Hashtag Updates</h3>
+        <DuplicateLength />
+      </>
+    )
+  }
+}
+
+class SectionTwo extends React.Component{
+  render() {
+    return(
+      <>
+        <h3>Type in hashtags here</h3>
+        <TextareaBox />
+      </>
+    )
+  }
+}
+
 class App extends React.Component {
   render() {
     return (
-      <div className="d-flex justify-content-between">
+      <div className="">
+        <SectionOne />
         <TextareaLogic />
       </div>
     );
